@@ -1,0 +1,14 @@
+{
+    "project_name": "Sample Project",
+    "project_slug": "{{ cookiecutter.project_name.lower()|replace(' ', '_')|replace('-', '_')|replace('.', '_')|trim() }}",
+    "description": "Project description",
+    "author_name": "Author name",
+    "author_email": "Author email",
+    "redis": "n",
+    "mongo": "n",
+    "sql": [
+        "n",
+        "mysql",
+        "postgres"
+    ]
+}

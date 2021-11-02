@@ -1,0 +1,70 @@
+version: '3.8'
+services:
+  {%- if cookiecutter.redis == "y" -%}
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - '6378:6379'
+  {% endif %}
+
+  {%- if cookiecutter.mongo == "y" -%}
+  mongo:
+    image: mongo:latest
+    container_name: mongodb
+    volumes:
+      - ${MONGO_VOLUME}:/docker-entrypoint-initdb.d/
+      - ${MONGO_VOLUME}:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+    ports:
+      - '27018:27017'
+  {% endif %}
+
+  {%- if cookiecutter.sql == "postgres" -%}
+  postgres:
+    image: postgres:13
+    ports:
+      - '5433:5432'
+    volumes:
+      - ${POSTGRES_VOLUME}:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=cdn_backend_dev
+    restart: always
+
+  {%- elif cookiecutter.sql == "mysql" -%}
+  mysql:
+    image: mysql:5.7
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: '${MYSQL_ROOT_PASSWORD}'
+      MYSQL_DATABASE: '${MYSQL_DATABASE}'
+      MYSQL_USER: '${MYSQL_USERNAME}'
+      MYSQL_PASSWORD: '${MYSQL_PASSWORD}'
+    ports:
+      - '3309:3306'
+    volumes:
+      - ${MYSQL_VOLUME}:/var/lib/mysql
+  {%- else -%}
+
+  {% endif %}
+
+  web:
+    build: .
+    image: {{ cookiecutter.project_slug }}:latest
+    container_name: web
+    volumes:
+      - '.:/app'
+    entrypoint: ['/app/entrypoint.sh', 'web', '--reload']
+    env_file: .env.local
+    ports:
+      - '8000:8000'
+
+    # depends_on:
+    #   - redis
+    #   - mongo
+    #   - postgres
+    #   - mysql
