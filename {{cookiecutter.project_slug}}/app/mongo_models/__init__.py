@@ -1,6 +1,3 @@
-#!/usr/bin/python
-# -*- coding: utf8 -*-
-
 from pymongo import MongoClient
 from ..core.settings import settings
 

@@ -4,11 +4,15 @@ from sqlalchemy_mixins import AllFeaturesMixin, TimestampsMixin
 
 from ..core.settings import settings
 
+{% if cookiecutter.sql == "pymysql" -%}
 # MySQL version
 connect_url = f"mysql+pymysql://{settings.SQL_USERNAME}:{settings.SQL_PASSWORD}@{settings.MYSQL_HOST}:{settings.MYSQL_PORT}/{settings.SQL_DATABASE}?charset=utf8mb4"
+{% endif -%}
 
+{% if cookiecutter.sql == "postgres" -%}
 # PostgreSQL version
-# connect_url = f"postgresql+psycopg2://{settings.SQL_USERNAME}:{settings.SQL_PASSWORD}@{settings.SQL_HOST}:{settings.SQL_PORT}/{settings.SQL_DATABASE}"
+connect_url = f"postgresql+psycopg2://{settings.SQL_USERNAME}:{settings.SQL_PASSWORD}@{settings.SQL_HOST}:{settings.SQL_PORT}/{settings.SQL_DATABASE}"
+{% endif -%}
 
 # Cloud SQL connector version
 # connect_url = engine.url.URL.create(
@@ -43,4 +47,4 @@ class Model(Base, AllFeaturesMixin, TimestampsMixin):
 
 Model.set_session(session)
 
-# from .user import User
+from .user import User

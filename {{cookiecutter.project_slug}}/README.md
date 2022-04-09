@@ -5,17 +5,17 @@
 ```
 Python 3.8
 Fastapi
-{%- if cookiecutter.redis == "y" -%}
+{% if cookiecutter.redis == "y" -%}
 Redis
-{% endif %}
-{%- if cookiecutter.mongo == "y" -%}
+{% endif -%}
+{% if cookiecutter.mongo == "y" -%}
 MongoDB
-{% endif %}
+{% endif -%}
 
-{%- if cookiecutter.sql == "postgres" -%}
+{% if cookiecutter.sql == "postgres" -%}
 PostgreSQL
-{%- elif cookiecutter.sql == "mysql" -%}
+{% elif cookiecutter.sql == "mysql" -%}
 MySQL
-{%- else -%}
-{% endif %}
+{% else -%}
+{% endif -%}
 ```
