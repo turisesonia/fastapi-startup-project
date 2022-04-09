@@ -1,14 +1,14 @@
 version: '3.8'
 services:
-  {%- if cookiecutter.redis == "y" -%}
+  {% if cookiecutter.redis == "y" -%}
   redis:
     image: redis
     container_name: redis
     ports:
       - '6378:6379'
-  {% endif %}
+  {% endif -%}
 
-  {%- if cookiecutter.mongo == "y" -%}
+  {% if cookiecutter.mongo == "y" -%}
   mongo:
     image: mongo:latest
     container_name: mongodb
@@ -20,9 +20,9 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: rootpassword
     ports:
       - '27018:27017'
-  {% endif %}
+  {% endif -%}
 
-  {%- if cookiecutter.sql == "postgres" -%}
+  {% if cookiecutter.sql == "postgres" -%}
   postgres:
     image: postgres:13
     ports:
@@ -35,7 +35,7 @@ services:
       - POSTGRES_DB=cdn_backend_dev
     restart: always
 
-  {%- elif cookiecutter.sql == "mysql" -%}
+  {% elif cookiecutter.sql == "mysql" -%}
   mysql:
     image: mysql:5.7
     container_name: mysql
@@ -48,9 +48,8 @@ services:
       - '3309:3306'
     volumes:
       - ${MYSQL_VOLUME}:/var/lib/mysql
-  {%- else -%}
-
-  {% endif %}
+  {% else -%}
+  {% endif -%}
 
   web:
     build: .
