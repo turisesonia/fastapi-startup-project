@@ -1,0 +1,52 @@
+version: '3'
+
+dotenv: ['.env.taskfile', ".env.deploy"]
+
+vars:
+  IMAGE_PATH: asia-east1-docker.pkg.dev/$PROJECT_ID/$REPOSITORY_ID/$IMAGE_NAME:latest
+
+tasks:
+  gcloud-init:
+    cmds:
+      - gcloud config set project $PROJECT_ID
+      - gcloud auth configure-docker asia-east1-docker.pkg.dev --quiet
+
+  docker-build:
+    cmds:
+      - echo "Building the docker image {{ .IMAGE_PATH }}"
+      - docker build . --tag {{ .IMAGE_PATH }}
+
+  docker-push:
+    cmds:
+      - echo "Pushing the docker image {{ .IMAGE_PATH }}"
+      - docker push {{ .IMAGE_PATH }}
+
+  docker-refresh:
+    cmds:
+      - task: docker-build
+      - task: docker-push
+
+  cloudrun:deploy:
+    cmds:
+      - |
+        gcloud run deploy $CLOUD_RUN_SERVICE_NAME \
+          --region asia-east1 \
+          --image "{{ .IMAGE_PATH }}" \
+          --platform managed \
+          --args=fastapi \
+          --port 80 \
+          --cpu=$CLOUD_RUN_CPU \
+          --memory=$CLOUD_RUN_MEMORY \
+          --network=$CLOUD_RUN_VPC_NETWORK \
+          --subnet=$CLOUD_RUN_VPC_SUBNET \
+          --vpc-egress=private-ranges-only \
+          --service-account=$SERVICE_ACCOUNT_EMAIL \
+          --timeout=5m \
+          --allow-unauthenticated \
+          --set-env-vars "APP_ENV=$APP_ENV" \
+          --set-env-vars "APP_DEBUG=$APP_DEBUG" \
+          --set-env-vars "DB_HOST=$DB_HOST" \
+          --set-env-vars "DB_PORT=$DB_PORT" \
+          --set-env-vars "DB_DATABASE=$DB_DATABASE" \
+          --set-env-vars "DB_USERNAME=$DB_USERNAME" \
+          --set-secrets "DB_PASSWORD=DB_PASSWORD:latest"
