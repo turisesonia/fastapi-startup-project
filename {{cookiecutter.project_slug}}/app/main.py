@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 
 from app.logger import logger
-from app.settings import settings
+from app.config import settings
 from app.exceptions import AppException, ErrorResponse
 
 app = FastAPI(title=settings.APP_NAME)
