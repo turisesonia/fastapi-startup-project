@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 
 from app.logger import logger
-from app.config.settings import settings
+from app.settings import settings
 from app.exceptions import AppException, ErrorResponse
 
 app = FastAPI(title=settings.APP_NAME)
@@ -36,7 +36,7 @@ async def backend_exception_handler(
 
 
 def api_app(app: FastAPI):
-    from app.api.v1.routes import health
+    from app.api.v1 import health
 
     app.include_router(health.router, prefix="/api/v1/health", tags=["Health"])
 
