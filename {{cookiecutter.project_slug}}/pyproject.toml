@@ -1,34 +1,61 @@
-[tool.poetry]
+[project]
 name = "{{ cookiecutter.project_slug }}"
-version = "0.0.1"
-description = ""
-authors = ["{{ cookiecutter.author_name }} <{{ cookiecutter.author_email }}>"]
+version = "0.1.0"
+description = "{{ cookiecutter.project_description }}"
+readme = "README.md"
+requires-python = ">={{ cookiecutter.python_version }}"
+dependencies = [
+    "fastapi[standard]>=0.116.2",
+    "pendulum>=3.1.0",
+    "psycopg[binary,pool]>=3.2.10",
+    "pydantic>=2.11.9",
+    "pydantic-settings>=2.10.1",
+    "python-dotenv>=1.1.1",
+    "sqlalchemy>=2.0.43",
+    "structlog>=25.4.0",
+    "structlog-cloudrun>=0.2.0",
+    "typer>=0.17.4",
+    "uvicorn>=0.35.0",
+]
 
-[tool.poetry.dependencies]
-python = "^3.8"
-fastapi = "^0.70.0"
-uvicorn = "^0.15.0"
-python-dotenv = "^0.19.1"
-loguru = "^0.5.3"
-{% if cookiecutter.mongo == "y" -%}
-pymongo = "^3.12.0"
-{% endif -%}
-{% if cookiecutter.sql != "n" -%}
-SQLAlchemy = "^1.4.25"
-sqlalchemy-mixins = "^1.5"
-{% endif -%}
-{% if cookiecutter.sql == "postgres" -%}
-psycopg2 = "^2.9.3"
-{% endif -%}
-{% if cookiecutter.sql == "mysql" -%}
-pymysql = "1.0.2"
-{% endif -%}
-arrow = "^1.2.0"
+[dependency-groups]
+dev = [
+    "alembic>=1.16.5",
+    "faker>=37.8.0",
+    "pytest>=8.4.2",
+    "pytest-mock>=3.15.1",
+]
 
-[tool.poetry.dev-dependencies]
-black = {version = "^20.8b1", allow-prereleases = true}
-pytest = "^6.2.5"
+[tool.poe.tasks]
+dev = "uvicorn app.main:app --reload --reload-include .env"
 
-[build-system]
-requires = ["poetry>=0.12"]
-build-backend = "poetry.masonry.api"
+[tool.pytest.ini_options]
+# Test discovery
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+# Output and reporting
+addopts = [
+    "-v",                 # verbose output
+    "--tb=short",         # shorter traceback format
+    "--strict-markers",   # treat unknown markers as errors
+    "--disable-warnings", # disable warnings
+    # "--cov=app",          # uncomment for coverage reporting
+    # "--cov-report=term-missing",
+    # "--cov-report=html",
+]
+
+# Markers for test categorization
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+    "api: marks tests as API tests",
+    "database: marks tests that require database connection",
+    "dev: marks tests that require development environment",
+]
+
+# Test filtering
+filterwarnings = ["ignore::UserWarning", "ignore::DeprecationWarning"]

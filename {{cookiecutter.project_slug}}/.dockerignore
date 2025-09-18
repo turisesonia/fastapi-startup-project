@@ -7,7 +7,6 @@
 *.pyd
 __pycache__
 Dockerfile
-*.lock
-*.toml
+logs
 docs
-tests
+resources/storage

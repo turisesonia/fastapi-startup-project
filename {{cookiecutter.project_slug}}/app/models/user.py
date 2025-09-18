@@ -1,22 +1,18 @@
 import sqlalchemy as sa
-from sqlalchemy.orm import relationship
-from sqlalchemy.ext.hybrid import hybrid_method
+from sqlalchemy.orm import Mapped, mapped_column
 
-from .. import models
+from ._base import Base
+from ._mixin import TimestampMixin, UuidPrimaryKeyMixin
 
 
-class User(models.Model):
+class User(Base, UuidPrimaryKeyMixin, TimestampMixin):
     __tablename__ = "users"
 
-    __repr_attrs__ = ["uid"]
+    __repr_attrs__ = ("id", "email", "name")
 
-    id = sa.Column(sa.BigInteger, primary_key=True, index=True)
-    uid = sa.Column(sa.String(255))
-    status = sa.Column(sa.Boolean, default=True)
+    uid: Mapped[str] = mapped_column(sa.String(120), unique=True)
+    email: Mapped[str] = mapped_column(sa.String(), unique=True)
+    password: Mapped[str] = mapped_column(sa.String(150), nullable=True)
+    name: Mapped[str] = mapped_column(sa.String(100), nullable=True)
 
-    # rooms = relationship(
-    #     "Room",
-    #     secondary=room_user.table,
-    #     overlaps="users",
-    #     lazy="dynamic",
-    # )
+

@@ -4,11 +4,5 @@
     "description": "Project description",
     "author_name": "Author name",
     "author_email": "Author email",
-    "redis": "n",
-    "mongo": "n",
-    "sql": [
-        "n",
-        "mysql",
-        "postgres"
-    ]
+    "python_version": "3.12"
 }
