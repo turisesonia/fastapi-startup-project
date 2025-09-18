@@ -1,69 +1,43 @@
-version: '3.8'
 services:
-  {% if cookiecutter.redis == "y" -%}
-  redis:
-    image: redis
-    container_name: redis
+  backend:
+    build: .
+    restart: always
     ports:
-      - '6378:6379'
-  {% endif -%}
+      - '8000:80'
+    env_file:
+      - .env
 
-  {% if cookiecutter.mongo == "y" -%}
-  mongo:
-    image: mongo:latest
-    container_name: mongodb
+    depends_on:
+      postgres:
+        condition: service_healthy
+        restart: true
+
+    command:
+      - fastapi
+      - --reload
+
     volumes:
-      - ${MONGO_VOLUME}:/docker-entrypoint-initdb.d/
-      - ${MONGO_VOLUME}:/data/db
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: rootpassword
-    ports:
-      - '27018:27017'
-  {% endif -%}
+      - ./app:/app/app
 
-  {% if cookiecutter.sql == "postgres" -%}
   postgres:
-    image: postgres:13
+    image: postgres:16
+    restart: always
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${DB_USERNAME} -d ${DB_DATABASE}']
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
     ports:
       - '5433:5432'
-    volumes:
-      - ${POSTGRES_VOLUME}:/var/lib/postgresql/data
+    env_file:
+      - .env
     environment:
-      - POSTGRES_USER=root
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=cdn_backend_dev
-    restart: always
-
-  {% elif cookiecutter.sql == "mysql" -%}
-  mysql:
-    image: mysql:5.7
-    container_name: mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: '${MYSQL_ROOT_PASSWORD}'
-      MYSQL_DATABASE: '${MYSQL_DATABASE}'
-      MYSQL_USER: '${MYSQL_USERNAME}'
-      MYSQL_PASSWORD: '${MYSQL_PASSWORD}'
-    ports:
-      - '3309:3306'
+      - POSTGRES_USER=${DB_USERNAME?Variable not set}
+      - POSTGRES_PASSWORD=${DB_PASSWORD?Variable not set}
+      - POSTGRES_DB=${DB_DATABASE?Variable not set}
     volumes:
-      - ${MYSQL_VOLUME}:/var/lib/mysql
-  {% else -%}
-  {% endif -%}
+      - postgres-data:/var/lib/postgresql/data
 
-  web:
-    build: .
-    image: {{ cookiecutter.project_slug }}:latest
-    container_name: web
-    volumes:
-      - '.:/app'
-    entrypoint: ['/app/entrypoint.sh', 'web', '--reload']
-    env_file: .env.local
-    ports:
-      - '8000:8000'
-
-    # depends_on:
-    #   - redis
-    #   - mongo
-    #   - postgres
-    #   - mysql
+volumes:
+  postgres-data:
