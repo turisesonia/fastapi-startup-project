@@ -13,13 +13,5 @@ def remove(filepath):
         shutil.rmtree(filepath)
 
 
-# if "{{cookiecutter.sql}}" == "n":
-#     # remove models folder if not use sql database
-#     remove(f"{app_path}/models")
-
-# if "{{cookiecutter.mongo}}" == "n":
-#     # remove mongo models if not use mongodb
-#     remove(f"{app_path}/mongo_models")
-
 # copy .env from .env.example
 shutil.copyfile(f"{project_path}/.env.example", f"{project_path}/.env")
