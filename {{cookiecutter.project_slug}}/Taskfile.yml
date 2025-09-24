@@ -13,13 +13,13 @@ tasks:
 
   docker-build:
     cmds:
-      - echo "Building the docker image {{ .IMAGE_PATH }}"
-      - docker build . --tag {{ .IMAGE_PATH }}
+      - echo "Building the docker image {% raw %}{{ .IMAGE_PATH }}{% endraw %}"
+      - docker build . --tag {% raw %}{{ .IMAGE_PATH }}{% endraw %}
 
   docker-push:
     cmds:
-      - echo "Pushing the docker image {{ .IMAGE_PATH }}"
-      - docker push {{ .IMAGE_PATH }}
+      - echo "Pushing the docker image {% raw %}{{ .IMAGE_PATH }}{% endraw %}"
+      - docker push {% raw %}{{ .IMAGE_PATH }}{% endraw %}
 
   docker-refresh:
     cmds:
@@ -31,7 +31,7 @@ tasks:
       - |
         gcloud run deploy $CLOUD_RUN_SERVICE_NAME \
           --region asia-east1 \
-          --image "{{ .IMAGE_PATH }}" \
+          --image "{% raw %}{{ .IMAGE_PATH }}{% endraw %}" \
           --platform managed \
           --args=fastapi \
           --port 80 \
